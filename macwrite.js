@@ -2,9 +2,9 @@ var appConsts = {
 	productname: "MacWrite",
 	productnameForDisplay: "MacWrite",
 	"description": "Demo app for nodeStorage.io.",
-	urlTwitterServer: "http://twitter.macwrite.org:1337/",
+	urlTwitterServer: "http://macwrite.nodestorage.io:1337/",
 	domain: "macwrite.org", 
-	version: "0.41"
+	version: "0.42"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
