@@ -24,7 +24,7 @@
 		<script src="http://fargo.io/code/shared/menus.js"></script>
 		<link href="http://fargo.io/code/shared/menus.css" rel="stylesheet" type="text/css">
 		
-		<script src="http://api.nodestorage.io/api.js"></script>
+		<script src="http://macwrite.nodestorage.io:1337/api.js"></script>
 		<script src="http://macwrite.org/macwrite.js"></script>
 		
 		<style>
@@ -39,16 +39,16 @@
 				margin-left: auto;
 				margin-right: auto;
 				}
+			.divEditorAndButtons {
+				width: 80%;
+				margin-left: auto;
+				margin-right: auto;
+				}
 			.myTextArea {
-				font-family: Ubuntu;
-				font-size: 22px;
 				width: 100%; 
-				line-height: 150%;
-				margin: 0;
-				margin-bottom: 5px;
+				height: 400px;
+				margin-top: 15px;
 				border: 1px solid silver;
-				height: 500px;
-				margin-top: 5px;
 				}
 			.divVersionNumber {
 				font-size: 12px;
@@ -56,11 +56,9 @@
 				float: right;
 				padding: 19px;
 				}
-			.btn {
-				width: 120px;
-				}
 			.btnSave {
 				float: right;
+				width: 120px;
 				}
 			</style>
 		</head>
@@ -82,6 +80,7 @@
 										<li><a onclick="sendATweet ();">Send tweet...</a></li>
 										<li><a onclick="getUserInfo ();">Get user info...</a></li>
 										<li><a onclick="getMyMostRecentTweet ();">My most recent tweet...</a></li>
+										<li><a onclick="viewEmbeddedTweet ('545288223870951425');">View embedded tweet...</a></li>
 										</ul>
 									</li>
 								<li class="dropdown" id="idReposMenu"> 
@@ -100,13 +99,25 @@
 										<li class="divider"></li>
 										<li><a onclick="settingsCommand ();">Settings...</a></li>
 										<li class="divider"></li>
-										<li><a onclick="fbToggleConnectCommand ();" id="idFacebookConnectMenuItem"></a></li>
-										<li><a onclick="twToggleConnectCommand ();" id="idTwitterConnectMenuItem"></a></li>
+										<li><a onclick="twToggleConnectCommand (confirmDialog);" id="idTwitterConnectMenuItem"></a></li>
 										</ul>
 									</li>
 								</ul>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+		<div class="divTweetViewer" comment="This is where we display an embedded tweet.">
+			<div id="idTweetViewer" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="attEditorLabel" aria-hidden="true">
+				<div class="modal-body">
+					<center>
+						<div id="idWhereToDisplayTweet">
+							</div>
+						</center>
+					</div>
+				<div class="modal-footer">
+					<a href="#" class="btn btn-primary" onclick="closeEmbeddedTweetViewer ();">Close</a>
 					</div>
 				</div>
 			</div>
@@ -118,10 +129,10 @@
 	<div class="divTabsFromOutline">
 	<div class="tabbable">
 		<ul class="nav nav-tabs" data-tabs="tabs">
-			<li class="active" ><a href="#idFont507"  data-toggle="tab">Font</a></li>
+			<li class="active" ><a href="#idFont423"  data-toggle="tab">Font</a></li>
 			</ul>
 		<div id="my-tab-content" class="tab-content">
-			<div class="active tab-pane" id="idFont507">
+			<div class="active tab-pane" id="idFont423">
 				<fieldset>
 					<div class="divPrefs">	<p>You can set the font and size we use to display text.</p><div class="clearfix">	<label for="textFont">Font:</label>	<div class="input">		<input class="xlarge prefsInput" id="textFont" name="textFont" size="50" type="text" value="" placeholder="Text display font" />		</div>	</div><div class="clearfix">	<label for="textFontSize">Font-size:</label>	<div class="input">		<input class="xlarge numberPrefsInput" id="textFontSize" name="textFontSize" size="7" type="text" value="" /><span class="textToRight">&nbsp;(pixels)</span>		</div>	</div><div class="clearfix">	<label for="textLineHeight">Line-height:</label>	<div class="input">		<input class="xlarge numberPrefsInput" id="textLineHeight" name="textLineHeight" size="7" type="text" value="" /><span class="textToRight">&nbsp;(pixels)</span>		</div>	</div>	</div>
 					</fieldset>
@@ -142,8 +153,10 @@
 			</div>
 		<div class="divPageBody">
 			<div class="divWholePageMessage" id="idEditor" style="display: none;">
-				<textarea class="myTextArea" id="idTextArea" onKeyUp="keyupTextArea ()" placeholder="Obviously this is a good place to write something."></textarea>
-				<button id="idSaveButton" class="btn btn-large btnSave" type="button" onclick="saveButtonClick ();">Save</button>
+				<div class="divEditorAndButtons">
+					<div><textarea class="myTextArea" id="idTextArea" onKeyUp="keyupTextArea ()" placeholder="Obviously this is a good place to write something."></textarea></div>
+					<button id="idSaveButton" class="btn btn-large btnSave" type="button" onclick="saveButtonClick ();">Save</button>
+					</div>
 				</div>
 			<div class="divWholePageMessage" id="idLogonMessage" style="display: none;">
 				<div class="divLogonMessage">

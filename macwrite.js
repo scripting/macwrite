@@ -4,11 +4,11 @@ var appConsts = {
 	"description": "Demo app for nodeStorage.io.",
 	urlTwitterServer: "http://macwrite.nodestorage.io:1337/",
 	domain: "macwrite.org", 
-	version: "0.42"
+	version: "0.44"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
-	textFont: "Ubuntu", textFontSize: 16, textLineHeight: 24,
+	textFont: "Ubuntu", textFontSize: 22, textLineHeight: 30,
 	lastTweetText: "", lastUserName: "davewiner"
 	};
 var flStartupFail = false;
@@ -49,6 +49,14 @@ function getMyMostRecentTweet () {
 			}
 		});
 	}
+function viewEmbeddedTweet (idTweet) {
+	$("#idTweetViewer").modal ("show"); 
+	twViewTweet (idTweet, "idWhereToDisplayTweet", function () {
+		});
+	}
+function closeEmbeddedTweetViewer () {
+	$("#idTweetViewer").modal ("hide"); 
+	}
 function applyPrefs () {
 	$("#idTextArea").css ("font-family", appPrefs.textFont);
 	$("#idTextArea").css ("font-size", appPrefs.textFontSize);
@@ -69,14 +77,17 @@ function saveButtonClick () {
 		console.log ("saveButtonClick: " + data.url + " (" + secondsSince (now) + " seconds)");
 		});
 	}
-function getTextFile () {
+function getTextFile (callback) {
 	twGetFile (myTextFilename, true, true, function (error, data) {
 		if (data != undefined) {
 			setText (data.filedata);
 			console.log ("getTextFile: data == " + jsonStringify (data));
 			}
 		else {
-			alertDialog ("There was an error getting the text file.");
+			console.log ("getTextFile: error == " + jsonStringify (error));
+			}
+		if (callback != undefined) {
+			callback ();
 			}
 		});
 	}
@@ -103,7 +114,7 @@ function prefsChanged () {
 	flPrefsChanged = true;
 	}
 function settingsCommand () {
-	twStorageToPrefs (function () {
+	twStorageToPrefs (appPrefs, function () {
 		prefsDialogShow ();
 		});
 	}
@@ -114,7 +125,7 @@ function everySecond () {
 	pingGoogleAnalytics ();
 	showHideEditor ();
 	if (flPrefsChanged) {
-		twPrefsToStorage ();
+		twPrefsToStorage (appPrefs);
 		flPrefsChanged = false;
 		}
 	}
@@ -142,15 +153,18 @@ function startup () {
 	initGoogleAnalytics (); 
 	twGetOauthParams ();
 	if (twIsTwitterConnected ()) {
-		twStorageStartup (function (flGoodStart) {
+		twStorageStartup (appPrefs, function (flGoodStart) {
 			flStartupFail = !flGoodStart;
-			showHideEditor ();
 			if (flGoodStart) {
-				appPrefs.ctStartups++;
-				prefsChanged ();
-				applyPrefs ();
-				getTextFile ();
-				self.setInterval (function () {everySecond ()}, 1000); 
+				getTextFile (function () {
+					showHideEditor ();
+					appPrefs.ctStartups++;
+					prefsChanged ();
+					applyPrefs ();
+					twGetTwitterConfig (function () { //twStorageData.twitterConfig will have information from twitter.com
+						self.setInterval (function () {everySecond ()}, 1000); 
+						});
+					});
 				}
 			});
 		}
