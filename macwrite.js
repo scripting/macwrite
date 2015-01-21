@@ -140,6 +140,19 @@ function settingsCommand () {
 		prefsDialogShow ();
 		});
 	}
+function initMenus () {
+	var cmdKeyPrefix = getCmdKeyPrefix (); //10/6/14 by DW
+	document.getElementById ("idMenuProductName").innerHTML = appConsts.productnameForDisplay; 
+	document.getElementById ("idMenuAboutProductName").innerHTML = appConsts.productnameForDisplay; 
+	$("#idMenubar .dropdown-menu li").each (function () {
+		var li = $(this);
+		var liContent = li.html ();
+		liContent = liContent.replace ("Cmd-", cmdKeyPrefix);
+		li.html (liContent);
+		});
+	twUpdateTwitterMenuItem ("idTwitterConnectMenuItem");
+	twUpdateTwitterUsername ("idTwitterUsername");
+	}
 function everySecond () {
 	var now = clockNow ();
 	twUpdateTwitterMenuItem ("idTwitterConnectMenuItem");
@@ -152,19 +165,6 @@ function everySecond () {
 		}
 	}
 function startup () {
-	function initMenus () {
-		var cmdKeyPrefix = getCmdKeyPrefix (); //10/6/14 by DW
-		document.getElementById ("idMenuProductName").innerHTML = appConsts.productnameForDisplay; 
-		document.getElementById ("idMenuAboutProductName").innerHTML = appConsts.productnameForDisplay; 
-		$("#idMenubar .dropdown-menu li").each (function () {
-			var li = $(this);
-			var liContent = li.html ();
-			liContent = liContent.replace ("Cmd-", cmdKeyPrefix);
-			li.html (liContent);
-			});
-		twUpdateTwitterMenuItem ("idTwitterConnectMenuItem");
-		twUpdateTwitterUsername ("idTwitterUsername");
-		}
 	console.log ("startup");
 	pathAppPrefs = "appPrefs.json"; 
 	twStorageData.urlTwitterServer = appConsts.urlTwitterServer;
