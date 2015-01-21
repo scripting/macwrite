@@ -26,7 +26,7 @@ var appConsts = {
 	"description": "Demo app for nodeStorage.io.",
 	urlTwitterServer: "http://macwrite.nodestorage.io:1337/",
 	domain: "macwrite.org", 
-	version: "0.44"
+	version: "0.45"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
@@ -71,8 +71,13 @@ function getMyMostRecentTweet () {
 			}
 		});
 	}
-function viewEmbeddedTweet (idTweet) {
+function viewEmbeddedTweet (idTweet, idWhereToDisplay) {
+	var idDiv = "#" + idWhereToDisplay;
 	$("#idTweetViewer").modal ("show"); 
+	$(idDiv).css ("visibility", "hidden");
+	$(idDiv).on ("load", function () { //the div holding for the tweet becomes visible when fully loaded
+		$(idDiv).css ("visibility", "visible");
+		});
 	twViewTweet (idTweet, "idWhereToDisplayTweet", function () {
 		});
 	}
@@ -166,14 +171,13 @@ function everySecond () {
 	}
 function startup () {
 	console.log ("startup");
-	pathAppPrefs = "appPrefs.json"; 
 	twStorageData.urlTwitterServer = appConsts.urlTwitterServer;
 	$("#idTwitterIcon").html (twStorageConsts.fontAwesomeIcon);
 	$("#idVersionNumber").html ("v" + appConsts.version);
 	initMenus ();
 	hitCounter (); 
 	initGoogleAnalytics (); 
-	twGetOauthParams ();
+	twGetOauthParams (); //redirects if OAuth params are present
 	if (twIsTwitterConnected ()) {
 		twStorageStartup (appPrefs, function (flGoodStart) {
 			flStartupFail = !flGoodStart;
