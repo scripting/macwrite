@@ -6,3 +6,11 @@ It's named after the famous and much-loved <a href="http://en.wikipedia.org/wiki
 
 I've provided the full source code to the app in this repo. You can try it out on <a href="http://macwrite.org/">macwrite.org</a>, a domain that was available, so I am using it, with great reverence of course. ;-)
 
+#### Running MacWrite on your server
+
+When you want to try running MacWrite with your nodeStorage server, you need to make two changes.
+
+1. In macwrite.js, change appConsts.urlTwitterServer to the address of your nodeStorage server.
+
+2. In index.html, change the &lt;script> statement that links to macwrite.nodestorage.io:1337/api.js to point to the copy of api.js on your server.
+
