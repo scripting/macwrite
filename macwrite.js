@@ -24,9 +24,9 @@ var appConsts = {
 	productname: "MacWrite",
 	productnameForDisplay: "MacWrite",
 	"description": "Demo app for nodeStorage.io.",
-	urlTwitterServer: "http://macwrite.nodestorage.io:1337/", //change this to point to your nodeStorage server
+	urlTwitterServer: "http://macwrite2.nodestorage.io/", //change this to point to your nodeStorage server
 	domain: "macwrite.org", 
-	version: "0.46"
+	version: "0.47"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,

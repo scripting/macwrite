@@ -12,5 +12,5 @@ When you want to try running MacWrite with your nodeStorage server, you need to 
 
 1. In macwrite.js, change appConsts.urlTwitterServer to the address of your nodeStorage server.
 
-2. In index.html, change the &lt;script> statement that links to macwrite.nodestorage.io:1337/api.js to point to the copy of api.js on your server.
+2. In index.html, change the &lt;script> statement that links to macwrite2.nodestorage.io/api.js to point to the copy of api.js on your server.
 
