@@ -24,9 +24,9 @@ var appConsts = {
 	productname: "MacWrite",
 	productnameForDisplay: "MacWrite",
 	"description": "Demo app for nodeStorage.io.",
-	urlTwitterServer: "http://macwrite3.nodestorage.io:5339/", //change this to point to your nodeStorage server
+	urlTwitterServer: "http://macwrite2.nodestorage.io/", //change this to point to your nodeStorage server
 	domain: "macwrite.org", 
-	version: "0.48"
+	version: "0.50"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
@@ -57,6 +57,16 @@ function getUserInfo () {
 			prefsChanged ();
 			console.log (jsonStringify (data)); //all the info is displayed in the console
 			alertDialog (data.description);
+			});
+		});
+	}
+function howManyTweets () { //6/22/15 by DW
+	askDialog ("Enter a user name:", appPrefs.lastUserName, "The Twitter user you want info about.", function (username) {
+		twGetUserInfo (username, function (data) {
+			appPrefs.lastUserName = username;
+			prefsChanged ();
+			console.log (jsonStringify (data)); //all the info is displayed in the console
+			alertDialog (appPrefs.lastUserName + " has sent " + data.statuses_count + " tweets.");
 			});
 		});
 	}
