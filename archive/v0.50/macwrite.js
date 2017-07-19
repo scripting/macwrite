@@ -23,8 +23,8 @@
 var appConsts = {
 	productname: "MacWrite",
 	productnameForDisplay: "MacWrite",
-	description: "Demo app for nodeStorage.io.",
-	urlTwitterServer: "http://macwrite2.nodestorage.io/"
+	"description": "Demo app for nodeStorage.io.",
+	urlTwitterServer: "http://macwrite2.nodestorage.io/", //change this to point to your nodeStorage server
 	domain: "macwrite.org", 
 	version: "0.50"
 	}
@@ -33,13 +33,10 @@ var appPrefs = {
 	textFont: "Ubuntu", textFontSize: 22, textLineHeight: 30,
 	lastTweetText: "", lastUserName: "davewiner"
 	};
-
-const fnameConfig = "config.json";
+var flStartupFail = false;
+var flPrefsChanged = false;
 var whenLastUserAction = new Date ();
 var myTextFilename = "myTextFile.txt";
-
-var myNodeStorageApp;
-
 
 function aboutTestingMenu () {
 	alertDialog ("Commands that test an installation of the <a href=\"http://nodestorage.io/\" target=\"_blank\">nodeStorage.io</a> server.");
@@ -49,7 +46,7 @@ function sendATweet () {
 		if (!flcancel) {
 			appPrefs.lastTweetText = s;
 			twTweet (s);
-			myNodeStorageApp.prefsChanged ();
+			prefsChanged ();
 			}
 		});
 	}
@@ -57,7 +54,7 @@ function getUserInfo () {
 	askDialog ("Enter a user name:", appPrefs.lastUserName, "The Twitter user you want info about.", function (username) {
 		twGetUserInfo (username, function (data) {
 			appPrefs.lastUserName = username;
-			myNodeStorageApp.prefsChanged ();
+			prefsChanged ();
 			console.log (jsonStringify (data)); //all the info is displayed in the console
 			alertDialog (data.description);
 			});
@@ -67,7 +64,7 @@ function howManyTweets () { //6/22/15 by DW
 	askDialog ("Enter a user name:", appPrefs.lastUserName, "The Twitter user you want info about.", function (username) {
 		twGetUserInfo (username, function (data) {
 			appPrefs.lastUserName = username;
-			myNodeStorageApp.prefsChanged ();
+			prefsChanged ();
 			console.log (jsonStringify (data)); //all the info is displayed in the console
 			alertDialog (appPrefs.lastUserName + " has sent " + data.statuses_count + " tweets.");
 			});
@@ -101,7 +98,7 @@ function applyPrefs () {
 	$("#idTextArea").css ("font-family", appPrefs.textFont);
 	$("#idTextArea").css ("font-size", appPrefs.textFontSize);
 	$("#idTextArea").css ("line-height", appPrefs.textLineHeight + "px");
-	myNodeStorageApp.prefsChanged ();
+	prefsChanged ();
 	}
 function keyupTextArea () {
 	}
@@ -135,7 +132,7 @@ function showHideEditor () {
 	var homeDisplayVal = "none", aboutDisplayVal = "none", startupFailDisplayVal = "none";
 	
 	if (twIsTwitterConnected ()) {
-		if (myNodeStorageApp.flStartupFail) {
+		if (flStartupFail) {
 			startupFailDisplayVal = "block";
 			}
 		else {
@@ -149,6 +146,9 @@ function showHideEditor () {
 	$("#idEditor").css ("display", homeDisplayVal);
 	$("#idLogonMessage").css ("display", aboutDisplayVal);
 	$("#idStartupFailBody").css ("display", startupFailDisplayVal);
+	}
+function prefsChanged () {
+	flPrefsChanged = true;
 	}
 function settingsCommand () {
 	twStorageToPrefs (appPrefs, function () {
@@ -168,47 +168,43 @@ function initMenus () {
 	twUpdateTwitterMenuItem ("idTwitterConnectMenuItem");
 	twUpdateTwitterUsername ("idTwitterUsername");
 	}
-function readConfig (callback) {
-	readHttpFile (fnameConfig, function (jsontext) { 
-		if (jsontext !== undefined) {
-			var jstruct = JSON.parse (jsontext);
-			for (var x in jstruct) {
-				appConsts [x] = jstruct [x];
-				}
-			}
-		if (callback !== undefined) {
-			callback ();
-			}
-		});
+function everySecond () {
+	var now = clockNow ();
+	twUpdateTwitterMenuItem ("idTwitterConnectMenuItem");
+	twUpdateTwitterUsername ("idTwitterUsername");
+	pingGoogleAnalytics ();
+	showHideEditor ();
+	if (flPrefsChanged) {
+		twPrefsToStorage (appPrefs);
+		flPrefsChanged = false;
+		}
 	}
 function startup () {
 	console.log ("startup");
+	twStorageData.urlTwitterServer = appConsts.urlTwitterServer;
 	$("#idTwitterIcon").html (twStorageConsts.fontAwesomeIcon);
 	$("#idVersionNumber").html ("v" + appConsts.version);
 	initMenus ();
-	readConfig (function () {
-		
-		myNodeStorageApp = new nodeStorageApp (appConsts, appPrefs);
-		
-		myNodeStorageApp.everySecond = function () {
-			showHideEditor ();
-			};
-		
-		myNodeStorageApp.start (function (flConnected) {
-			if (flConnected) {
+	hitCounter (); 
+	initGoogleAnalytics (); 
+	twGetOauthParams (); //redirects if OAuth params are present
+	if (twIsTwitterConnected ()) {
+		twStorageStartup (appPrefs, function (flGoodStart) {
+			flStartupFail = !flGoodStart;
+			if (flGoodStart) {
 				getTextFile (function () {
 					showHideEditor ();
 					appPrefs.ctStartups++;
-					myNodeStorageApp.prefsChanged ();
+					prefsChanged ();
 					applyPrefs ();
-					hitCounter (); 
-					initGoogleAnalytics (); 
+					twGetTwitterConfig (function () { //twStorageData.twitterConfig will have information from twitter.com
+						self.setInterval (function () {everySecond ()}, 1000); 
+						});
 					});
 				}
-			else {
-				showHideEditor ();
-				}
 			});
-		
-		});
+		}
+	else {
+		showHideEditor ();
+		}
 	}
