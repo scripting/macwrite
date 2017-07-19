@@ -44,29 +44,42 @@ function nodeStorageApp (consts, prefs) {
 		flPrefsChanged = true;
 		};
 	this.start = function (callback) {
+		function docallback (flConnected) {
+			if (callback !== undefined) {
+				callback (flConnected);
+				}
+			}
 		twStorageData.urlTwitterServer = myConsts.urlTwitterServer;
+		if (localStorage.urlTwitterServer !== undefined) { 
+			twStorageData.urlTwitterServer = localStorage.urlTwitterServer;
+			}
 		if (myConsts.pathAppPrefs !== undefined) {
 			twStorageData.pathAppPrefs = myConsts.pathAppPrefs;
 			}
-		twGetOauthParams (); //redirects if OAuth params are present
+		
+		if (twGetOauthParams ()) { //redirects if OAuth params are present, returns true
+			console.log ("nodeStorageApp.start: redirecting after processing OAuth params.");
+			docallback (false);
+			return;
+			}
+		
 		if (twIsTwitterConnected ()) {
 			twStorageStartup (myPrefs, function (flGoodStart) {
 				this.flStartupFail = !flGoodStart;
 				if (flGoodStart) {
 					console.log ("nodeStorageApp.start: myPrefs == " + jsonStringify (myPrefs));
 					twGetTwitterConfig (function () { //twStorageData.twitterConfig will have information from twitter.com
-						if (callback !== undefined) {
-							callback (true);
-							}
+						docallback (true);
 						self.setInterval (everySecond, 1000); 
 						});
+					}
+				else {
+					docallback (false);
 					}
 				});
 			}
 		else {
-			if (callback !== undefined) {
-				callback (false);
-				}
+			docallback (false);
 			}
 		}
 	};

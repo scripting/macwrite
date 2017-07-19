@@ -25,7 +25,7 @@ var appConsts = {
 	productnameForDisplay: "MacWrite",
 	description: "Demo app for nodeStorage.io.",
 	domain: "macwrite.org", 
-	version: "0.60"
+	version: "0.61"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
@@ -36,9 +36,7 @@ var appPrefs = {
 const fnameConfig = "config.json";
 var whenLastUserAction = new Date ();
 var myTextFilename = "myTextFile.txt";
-
 var myNodeStorageApp;
-
 
 function aboutTestingMenu () {
 	alertDialog ("Commands that test an installation of the <a href=\"http://nodestorage.io/\" target=\"_blank\">nodeStorage.io</a> server.");
@@ -130,25 +128,6 @@ function getTextFile (callback) {
 			}
 		});
 	}
-function showHideEditor () {
-	var homeDisplayVal = "none", aboutDisplayVal = "none", startupFailDisplayVal = "none";
-	
-	if (twIsTwitterConnected ()) {
-		if (myNodeStorageApp.flStartupFail) {
-			startupFailDisplayVal = "block";
-			}
-		else {
-			homeDisplayVal = "block";
-			}
-		}
-	else {
-		aboutDisplayVal = "block";
-		}
-	
-	$("#idEditor").css ("display", homeDisplayVal);
-	$("#idLogonMessage").css ("display", aboutDisplayVal);
-	$("#idStartupFailBody").css ("display", startupFailDisplayVal);
-	}
 function settingsCommand () {
 	twStorageToPrefs (appPrefs, function () {
 		prefsDialogShow ();
@@ -186,13 +165,29 @@ function startup () {
 	$("#idVersionNumber").html ("v" + appConsts.version);
 	initMenus ();
 	readConfig (function () {
-		
+		function showHideEditor (flStartupFail) {
+			var homeDisplayVal = "none", aboutDisplayVal = "none", startupFailDisplayVal = "none";
+			
+			if (twIsTwitterConnected ()) {
+				if (flStartupFail) {
+					startupFailDisplayVal = "block";
+					}
+				else {
+					homeDisplayVal = "block";
+					}
+				}
+			else {
+				aboutDisplayVal = "block";
+				}
+			
+			$("#idEditor").css ("display", homeDisplayVal);
+			$("#idLogonMessage").css ("display", aboutDisplayVal);
+			$("#idStartupFailBody").css ("display", startupFailDisplayVal);
+			}
 		myNodeStorageApp = new nodeStorageApp (appConsts, appPrefs);
-		
 		myNodeStorageApp.everySecond = function () {
 			showHideEditor ();
 			};
-		
 		myNodeStorageApp.start (function (flConnected) {
 			if (flConnected) {
 				getTextFile (function () {
@@ -205,9 +200,8 @@ function startup () {
 					});
 				}
 			else {
-				showHideEditor ();
+				showHideEditor (true);
 				}
 			});
-		
 		});
 	}
