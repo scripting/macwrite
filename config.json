@@ -1,4 +1,4 @@
 {
-	"urlTwitterServer": "http://electricserver.scripting.com/",
-	"pathAppPrefs": "macWritePrefs.json"
+	"urlTwitterServer": "http://macwrite2.nodestorage.io/",
+	"pathAppPrefs": "appPrefs.json"
 	}
