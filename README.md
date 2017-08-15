@@ -14,6 +14,10 @@ To run MacWrite on your nodeStorage server, you need to make two changes.
 
 ### Updates
 
+#### v0.70 -- 8/15/17 by DW
+
+Moved the definition of nodeStorageApp to the api.js file for nodeStorage itself. I just wrote another app that uses the new interface, and didn't want to include the api.js file from MacWrite, a demo app. 
+
 #### v0.60 -- 7/20/17 by DW
 
 Factored the top level of the app into an API, which means more of the interface code is out of the app-developer's way. 

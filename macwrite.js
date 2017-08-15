@@ -25,7 +25,7 @@ var appConsts = {
 	productnameForDisplay: "MacWrite",
 	description: "Demo app for nodeStorage.io.",
 	domain: "macwrite.org", 
-	version: "0.61"
+	version: "0.70"
 	}
 var appPrefs = {
 	ctStartups: 0, minSecsBetwAutoSaves: 3,
